@@ -12,7 +12,7 @@ function SharedComponents() {
       <Header />
       <AlertSection />
       <Outlet />
-      {/* <Youtube/> */}
+      <Youtube/>
       <Footer />
     </>
   );

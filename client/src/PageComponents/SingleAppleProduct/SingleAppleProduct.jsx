@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEffect,useState } from 'react';
-import { data, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Four04 from '../Four04/Four04';
 
 function SingleAppleProduct() {
@@ -58,12 +58,12 @@ console.log(single);
                                   </div>
                                 </div>
                               </div>
-                            );
-                        })};
+                            )
+                        })}
                     </div>
                 </section>
           </>       
-        );
+        )
     
     }else{
         return<Four04/>;
