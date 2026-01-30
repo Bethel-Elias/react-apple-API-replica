@@ -15,13 +15,19 @@ App.use(cors());
 App.use(express.json());
 App.use(express.urlencoded({ extended: true }));
 
+// to check server is running yegara hosting
+// App.get("/test", (req, res) => {
+//   res.send("backend Server is running");
+// });
 
 let connection = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   host: process.env.DB_HOST,
   database: process.env.DB_DATABASE,
-  socketPath: "/Applications/MAMP/tmp/mysql/mysql.sock",
+  port: process.env.DB_PORT,
+  connectTimeout: 10000,
+  // socketPath: "/Applications/MAMP/tmp/mysql/mysql.sock",
 });
 
 connection.connect(err => {
@@ -79,7 +85,7 @@ App.get("/install", (req, res) => {
   let Order = `CREATE TABLE if not exists ProductOrder(
     order_id varchar(255) not null,
     product_id int(11) not null,
-    user_id int auto_increment,
+    user_id INT NOT NULL,
 
 
     PRIMARY KEY (order_id),
@@ -240,7 +246,8 @@ App.get("/iphone/:product_id",(req,res) => {
     FROM ProductTable 
     JOIN ProductDescription ON ProductTable.product_id = ProductDescription.product_id 
     JOIN ProductPrice ON ProductTable.product_id = ProductPrice.product_id
-    WHERE ProductTable.product_id = ${ID}`,
+    WHERE ProductTable.product_id = ?`,
+    [ID],
 
     (err, rows) => {
       if (!err) res.json({ productsall: rows });
