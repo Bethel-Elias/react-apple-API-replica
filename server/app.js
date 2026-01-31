@@ -1,4 +1,3 @@
-
 /* question-1 */
 require("dotenv").config();
 let mysql = require("mysql2");
@@ -16,9 +15,11 @@ App.use(express.json());
 App.use(express.urlencoded({ extended: true }));
 
 // to check server is running yegara hosting
-// App.get("/test", (req, res) => {
-//   res.send("backend Server is running");
-// });
+App.get("/test", (req, res) => {
+  res.send("backend Server is running");
+});
+
+const PORT = process.env.PORT || 4000;
 
 let connection = mysql.createConnection({
   user: process.env.DB_USER,
@@ -27,23 +28,21 @@ let connection = mysql.createConnection({
   database: process.env.DB_DATABASE,
   port: process.env.DB_PORT,
   connectTimeout: 10000,
+
   // socketPath: "/Applications/MAMP/tmp/mysql/mysql.sock",
 });
 
-connection.connect(err => {
+connection.connect((err) => {
   if (err) {
     console.log(err);
-  }else {
+  } else {
     console.log("Connected");
   }
 });
 
-
 /* question-2 */
 
 App.get("/install", (req, res) => {
-
-
   let Products = `CREATE TABLE if not exists ProductTable(        
   product_id int auto_increment,        
   product_url varchar(255) not null,        
@@ -83,7 +82,7 @@ App.get("/install", (req, res) => {
 )`;
 
   let Order = `CREATE TABLE if not exists ProductOrder(
-    order_id varchar(255) not null,
+    order_id INT AUTO_INCREMENT,
     product_id int(11) not null,
     user_id INT NOT NULL,
 
@@ -105,7 +104,7 @@ App.get("/install", (req, res) => {
   connection.query(User, (err) => {
     if (err) console.log(err);
   });
-  connection.query(Order, (err, ) => {
+  connection.query(Order, (err) => {
     if (err) console.log(err);
   });
 
@@ -131,7 +130,7 @@ App.post("/add-product", (req, res) => {
     // order_id,
   } = req.body;
 
-  let insertProduct = `INSERT INTO productTable (product_url,product_name) VALUES (?, ?) ;`;
+  let insertProduct = `INSERT INTO ProductTable (product_url,product_name) VALUES (?, ?) ;`;
 
   let insertDescription = `INSERT INTO ProductDescription (product_id, product_brief_description,product_description,product_img,product_link) VALUES (?, ?, ?, ?, ?) ;`;
 
@@ -141,18 +140,32 @@ App.post("/add-product", (req, res) => {
 
   // let insertOrder = `INSERT INTO ProductOrder (order_id,product_id) VALUES (?, ?) ;`;
 
-  connection.query(insertProduct,[product_url, product_name],(err, results) => {
+  connection.query(
+    insertProduct,
+    [product_url, product_name],
+    (err, results) => {
       if (err) console.log(`error found: ${err}`);
       console.log(results);
 
       let id = results.insertId;
 
-      connection.query(insertDescription,[id, product_brief_description, product_description, product_img, product_link,],
+      connection.query(
+        insertDescription,
+        [
+          id,
+          product_brief_description,
+          product_description,
+          product_img,
+          product_link,
+        ],
         (err, results) => {
           if (err) console.log(`error found: ${err}`);
         }
       );
-      connection.query(insertPrice,[id, starting_price, price_range],(err, results) => {
+      connection.query(
+        insertPrice,
+        [id, starting_price, price_range],
+        (err, results) => {
           if (err) console.log(`error found: ${err}`);
         }
       );
@@ -162,67 +175,65 @@ App.post("/add-product", (req, res) => {
       // connection.query(insertOrder, [id, order_id], (err, results) => {
       //   if (err) console.log(`error found: ${err}`);
       // });
-      
-    });
-    res.send("Data inserted");
-  });
+    }
+  );
+  res.send("Data inserted");
+});
 
-  // App.put("/update", (req, res) => {
-  //   let { product_url, product_name } = req.body;
-  //   console.table(req.body);
+// App.put("/update", (req, res) => {
+//   let { product_url, product_name } = req.body;
+//   console.table(req.body);
 
-  //   let updateTable = `UPDATE ProductTable
-  //                     SET product_name = 'iphone';
-  //                     WHERE procuct_id = '34'`;
+//   let updateTable = `UPDATE ProductTable
+//                     SET product_name = 'iphone';
+//                     WHERE procuct_id = '34'`;
 
-  //   connection.query(updateTable, (err, results) => {
-  //     if (err) throw err;
-  //     console.log(results.affectedRows + " record(s) updated");
-    
-  //   })
-  //     res.end("updated");
-  // });
+//   connection.query(updateTable, (err, results) => {
+//     if (err) throw err;
+//     console.log(results.affectedRows + " record(s) updated");
 
-  // App.delete("/remove", (req, res) => {
-  //   let {
-  //     product_url,
-  //     product_name,
-  //     product_brief_description,
-  //     product_description,
-  //     product_img,
-  //     product_link,
-  //     starting_price,
-  //     price_range,
-  //     // user_name,
-  //     // user_password,
-  //     // order_id,
-  //   } = req.body;
+//   })
+//     res.end("updated");
+// });
 
-  //   let removeProducts = `DELETE FROM productTable WHERE product_id =6`
-  //   let removeDescription = `DELETE FROM productTable WHERE product_id =6`;
-  //   let removeprice = `DELETE FROM productTable WHERE product_id =6`;
+// App.delete("/remove", (req, res) => {
+//   let {
+//     product_url,
+//     product_name,
+//     product_brief_description,
+//     product_description,
+//     product_img,
+//     product_link,
+//     starting_price,
+//     price_range,
+//     // user_name,
+//     // user_password,
+//     // order_id,
+//   } = req.body;
 
-  //   connection.query(removeprice, (err, results) => {
-  //     if (err) throw err;
-  //     console.log(results.affectedRows + " record(s) Deleted");
-  //   });
+//   let removeProducts = `DELETE FROM productTable WHERE product_id =6`
+//   let removeDescription = `DELETE FROM productTable WHERE product_id =6`;
+//   let removeprice = `DELETE FROM productTable WHERE product_id =6`;
 
-  // connection.query(removeDescription, (err, results) => {
-  //   if (err) throw err;
-  //   console.log(results.affectedRows + " record(s) Deleted");
-  // });
+//   connection.query(removeprice, (err, results) => {
+//     if (err) throw err;
+//     console.log(results.affectedRows + " record(s) Deleted");
+//   });
 
-  // connection.query(removeProducts, (err, results) => {
-  //   if (err) throw err;
-  //   console.log(results.affectedRows + " record(s) Deleted");
-  // });
+// connection.query(removeDescription, (err, results) => {
+//   if (err) throw err;
+//   console.log(results.affectedRows + " record(s) Deleted");
+// });
 
-  // res.end("Deleted")
-  // });
+// connection.query(removeProducts, (err, results) => {
+//   if (err) throw err;
+//   console.log(results.affectedRows + " record(s) Deleted");
+// });
 
+// res.end("Deleted")
+// });
 
-App.get("/iphone", (req,res) => {
-
+App.get("/iphone", (req, res) => {
   connection.query(
     `SELECT * 
     FROM ProductTable 
@@ -230,15 +241,14 @@ App.get("/iphone", (req,res) => {
     JOIN ProductPrice ON ProductTable.product_id = ProductPrice.product_id`,
 
     (err, rows) => {
-      if (!err) res.json( {productsall: rows} );
+      if (!err) res.json({ productsall: rows });
       else console.log(err);
     }
   );
-// res.end("data selected")
+  // res.end("data selected")
 });
 
-
-App.get("/iphone/:product_id",(req,res) => {
+App.get("/iphone/:product_id", (req, res) => {
   let ID = req.params.product_id;
   console.log(ID);
   connection.query(
@@ -254,19 +264,16 @@ App.get("/iphone/:product_id",(req,res) => {
       else console.log(err);
     }
   );
-})
+});
 
+// App.listen(4000, (err) => {
+//   if (err) {
+//     console.log(err);
+//   } else {
+//     console.log("server is running at http://localhost:4000");
+//   }
+// });
 
-
-
-
-
-
-  App.listen(4000, (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("server is running at http://localhost:4000");
-    }
-  });
-
+App.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
